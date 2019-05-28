@@ -1,6 +1,8 @@
 package com.example.alltimeline;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,14 +15,15 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class Search extends AppCompatActivity {
-
+    private EditText search_box;
+    private TextView output;
     private RecyclerView listview;
     private SearchAdapter adapter;
+    private String url = "http://165.246.241.106:3000/categories";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +32,18 @@ public class Search extends AppCompatActivity {
         setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final EditText edittext=findViewById(R.id.search_box);
-        Button button=findViewById(R.id.search_button);
-        final TextView textView=findViewById(R.id.output);
+        search_box = findViewById(R.id.search_box);
+        Button button = findViewById(R.id.search_button);
+        output = findViewById(R.id.output);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                textView.setText(edittext.getText().toString());
+                NetworkTask networkTask = new NetworkTask(url, null);
+                networkTask.execute();
             }
         });
 
-        edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        search_box.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 switch (actionId) {
@@ -56,24 +60,39 @@ public class Search extends AppCompatActivity {
         init();
     }
 
+    public class NetworkTask extends AsyncTask<Void, Void, String> {
+
+        private String url;
+        private ContentValues values;
+
+        public NetworkTask(String url, ContentValues values) {
+
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            output.setText(s);
+        }
+    }
+
     private void init() {
 
         listview = findViewById(R.id.search_listview);
         listview.setLayoutManager(new GridLayoutManager(this, 3));
 
         ArrayList<String> itemList = new ArrayList<>();
-        itemList.add("한국사");
-        itemList.add("세계사");
-        itemList.add("과학사");
-        itemList.add("미술사");
-        itemList.add("아시아사");
-        itemList.add("유럽사");
-        itemList.add("한국사");
-        itemList.add("세계사");
-        itemList.add("과학사");
-        itemList.add("미술사");
-        itemList.add("아시아사");
-        itemList.add("유럽사");
         itemList.add("한국사");
         itemList.add("세계사");
         itemList.add("과학사");
@@ -90,7 +109,7 @@ public class Search extends AppCompatActivity {
     private View.OnClickListener onClickItem = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            MyApplication myApp = (MyApplication)getApplicationContext();
+            /*MyApplication myApp = (MyApplication)getApplicationContext();
             if(myApp.getCategory_num() < 5) {
                 MyApplication.Category tmp1 = new MyApplication.Category("한국사");
                 tmp1.Add_Event(0, 1010, 5, "OS과제");
@@ -103,8 +122,8 @@ public class Search extends AppCompatActivity {
                 String str = (String) v.getTag();
                 Toast.makeText(Search.this, str + " 추가완료", Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(Search.this, "연표가 5개를 넘을 수 없습니다", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                Toast.makeText(Search.this, "연표가 5개를 넘을 수 없습니다", Toast.LENGTH_SHORT).show();*/
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         }
     };
@@ -129,7 +148,7 @@ public class Search extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_add) {
-            Intent intent = new Intent(getApplicationContext(),Add.class);
+            Intent intent = new Intent(getApplicationContext(), Add.class);
             startActivity(intent);
             return true;
         }

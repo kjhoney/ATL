@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Add_User_Category">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="left"
+        android:text=""
+        android:textAlignment="center"
+        android:textColor="#000000"/>
+    <Button
+        android:id="@+id/event_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="연도를 선택해주세요."/>
+    <EditText
+        android:id="@+id/event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="제목을 입력하세요."/>
+    <EditText
+        android:id="@+id/event_memo"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:inputType="text"
+        android:hint="내용을 입력하세요."
+        android:gravity="top"/>
+</LinearLayout>

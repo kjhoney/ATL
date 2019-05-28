@@ -6,14 +6,42 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
-public class DBHelper {
+import java.util.ArrayList;
+
+public class DBHelper implements BaseColumns {
 
     private static final String DATABASE_NAME = "InnerDatabase(SQLite).db";
     private static final int DATABASE_VERSION = 1;
     public static SQLiteDatabase mDB;
     private DatabaseHelper mDBHelper;
     private Context mCtx;
+
+    private static final String _TABLENAME0 = "category";
+    private static final String _TABLENAME1 = "event";
+
+    // Category Table Column
+    private static final String CATEGORY_NAME = "category_name";
+    private static final String TYPE = "type";
+
+    // Event Table Column
+    private static final String CATEGORY_ID = "category_id";
+    private static final String EVENT_NAME = "event_name";
+    private static final String YEAR = "year";
+    private static final String MEMO = "memo";
+
+    private static final String _CREATE0 = "create table if not exists "+_TABLENAME0+"("
+            +_ID+" integer primary key autoincrement, "
+            +CATEGORY_NAME+" text not null, "
+            +TYPE+" integer not null );";
+
+    private static final String _CREATE1 = "create table if not exists "+_TABLENAME1+"("
+            +_ID+" integer primary key autoincrement, "
+            +CATEGORY_ID+" integer not null , "
+            +EVENT_NAME+" text not null , "
+            +YEAR+" integer not null , "
+            +MEMO+" text not null );";
 
     private class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -23,12 +51,14 @@ public class DBHelper {
 
         @Override
         public void onCreate(SQLiteDatabase db){
-            db.execSQL(DataBases.CreateDB._CREATE0);
+            db.execSQL(_CREATE0);
+            db.execSQL(_CREATE1);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS "+DataBases.CreateDB._TABLENAME0);
+            db.execSQL("DROP TABLE IF EXISTS "+_TABLENAME0);
+            db.execSQL("DROP TABLE IF EXISTS "+_TABLENAME1);
             onCreate(db);
         }
     }
@@ -52,37 +82,95 @@ public class DBHelper {
     }
 
     // Insert DB
-    public long insertColumn(String eventid, String name, long year , long length){
+    public long insertCategory(String name, int type){
         ContentValues values = new ContentValues();
-        values.put(DataBases.CreateDB.EVENTID, eventid);
-        values.put(DataBases.CreateDB.NAME, name);
-        values.put(DataBases.CreateDB.YEAR, year);
-        values.put(DataBases.CreateDB.LENGTH, length);
-        return mDB.insert(DataBases.CreateDB._TABLENAME0, null, values);
+        values.put(CATEGORY_NAME, name);
+        values.put(TYPE, type);
+        return mDB.insert(_TABLENAME0, null, values);
+    }
+
+    public long insertEvent(int category_id, String name, int year, String memo){
+        ContentValues values = new ContentValues();
+        values.put(CATEGORY_ID, category_id);
+        values.put(EVENT_NAME, name);
+        values.put(YEAR, year);
+        values.put(MEMO, memo);
+        return mDB.insert(_TABLENAME1, null, values);
     }
 
     // Update DB
-    public boolean updateColumn(long id, String eventid, String name, long year , long length){
+    public boolean updateEvent(long id, String name, int year, String memo){
         ContentValues values = new ContentValues();
-        values.put(DataBases.CreateDB.EVENTID, eventid);
-        values.put(DataBases.CreateDB.NAME, name);
-        values.put(DataBases.CreateDB.YEAR, year);
-        values.put(DataBases.CreateDB.LENGTH, length);
-        return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=" + id, null) > 0;
+        values.put(EVENT_NAME, name);
+        values.put(YEAR, year);
+        values.put(MEMO, memo);
+        return mDB.update(_TABLENAME1, values, "_id=" + id, null) > 0;
     }
 
     // Delete All
-    public void deleteAllColumns() {
-        mDB.delete(DataBases.CreateDB._TABLENAME0, null, null);
+    public void deleteAllEvents(long c_id) {
+        mDB.delete(_TABLENAME1, "category_id="+c_id, null);
     }
 
     // Delete DB
     public boolean deleteColumn(long id){
-        return mDB.delete(DataBases.CreateDB._TABLENAME0, "_id="+id, null) > 0;
+        return mDB.delete(_TABLENAME0, "_id="+id, null) > 0;
     }
+
     // Select DB
-    public Cursor selectColumns(){
-        return mDB.query(DataBases.CreateDB._TABLENAME0, null, null, null, null, null, null);
+    public Category selectCategory(long id) {
+        String sql = "select * from " + _TABLENAME0 + " where _id = '" + id + "';";
+        Cursor results = mDB.rawQuery(sql, null);
+
+        results.moveToFirst();
+        Category item = new Category(results.getInt(0), results.getString(1), results.getInt(2));
+        results.close();
+        return item;
+    }
+
+    public Event selectEvent(long id) {
+        String sql = "select * from " + _TABLENAME1 + " where _id = '" + id + "';";
+        Cursor results = mDB.rawQuery(sql, null);
+
+        results.moveToFirst();
+        Event item = new Event(results.getInt(0), results.getInt(1), results.getString(2),
+                results.getInt(3), results.getString(4));
+        results.close();
+        return item;
+    }
+
+    public ArrayList<Category> selectAll() {
+        String sql = "select * from " + _TABLENAME0 + " ORDER BY CATEGORY_NAME;";
+        Cursor results = mDB.rawQuery(sql, null);
+
+        results.moveToFirst();
+        ArrayList<Category> data = new ArrayList<>();
+
+        while (!results.isAfterLast()) {
+            Category item = new Category(results.getInt(0), results.getString(1),
+                    results.getInt(2));
+            data.add(item);
+            results.moveToNext();
+        }
+        results.close();
+        return data;
+    }
+
+    public ArrayList<Event> selectAllEvent(long c_id) {
+        String sql = "select * from " + _TABLENAME1 + " where CATEGORY_ID = '" + c_id + "' ORDER BY YEAR;";
+        Cursor results = mDB.rawQuery(sql, null);
+
+        results.moveToFirst();
+        ArrayList<Event> data = new ArrayList<>();
+
+        while (!results.isAfterLast()) {
+            Event item = new Event(results.getInt(0), results.getInt(1), results.getString(2),
+                    results.getInt(3), results.getString(4));
+            data.add(item);
+            results.moveToNext();
+        }
+        results.close();
+        return data;
     }
 
     // sort by column

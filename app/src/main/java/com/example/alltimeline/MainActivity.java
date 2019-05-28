@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
     private final int YEAR_VIEW_ID = 0x4000;
     private final int DYNAMIC_VIEW_ID  = 0x8000;
@@ -44,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_search) {
-            Intent intent = new Intent(getApplicationContext(),Search.class);
+            Intent intent = new Intent(getApplicationContext(), Search.class);
             startActivity(intent);
             return true;
         }
         if (id == R.id.action_add) {
-            Intent intent = new Intent(getApplicationContext(),Add.class);
+            Intent intent = new Intent(getApplicationContext(), Add.class);
             startActivity(intent);
             return true;
         }
@@ -61,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0; i<50; i++) {
             AddYearView(yearLayout);
         }
-        MyApplication myApp = (MyApplication)getApplicationContext();
+        /*MyApplication myApp = (MyApplication)getApplicationContext();
         ArrayList<MyApplication.Category> myArray = myApp.getCategory_list();
         int idx = 1;
         for(Object object : myArray) {
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 AddCategoryView(dynamicLayout, event.title, event.length);
             }
             idx++;
-        }
+        }*/
     }
 
     private void AddYearView(LinearLayout layout) {

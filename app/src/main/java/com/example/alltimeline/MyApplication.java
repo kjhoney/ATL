@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class MyApplication extends Application {
 
-    public int Category_num = 0;
+    /*public int Category_num = 0;
     public int User_Category_num = 0;
     public ArrayList<Category> Category_list = new ArrayList<>();
     public ArrayList<Category> User_Category_list = new ArrayList<>();
@@ -84,5 +84,5 @@ public class MyApplication extends Application {
 
     public ArrayList<Category> getCategory_list(){
         return Category_list;
-    }
+    }*/
 }
